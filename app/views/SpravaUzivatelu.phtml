@@ -1,0 +1,133 @@
+<?php
+
+    global $login;
+
+    if ($login->isUserLogged()) {
+        if ($login->getRole() == 3) {
+
+?>
+    <section class="position-relative py-4 py-xl-5" style="background: var(--bs-warning-bg-subtle);">
+        <?php
+            function cisloRoleNaString($i): string {
+                if ($i == 1) {
+                    return "písař";
+                } elseif ($i == 2) {
+                    return "recenzent";
+                } else {
+                    return "admin";
+                }
+            }
+        ?>
+        <h2 style="text-align: center;">Správa uživatelů</h2>
+        <div class="container-fluid">
+            <div class="card" id="TableSorterCard">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped table tablesorter" id="ipi-table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center filter-false sorter-false">Jméno</th>
+                                        <th class="text-center">Příjmení</th>
+                                        <th class="text-center">Přezdívka</th>
+                                        <th class="text-center">email</th>
+                                        <th class="text-center">Role</th>
+                                        <th class="text-center">Změnit roli</th>
+                                        <th class="text-center">Zabanování/Odbanování</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                <?php
+                                    if (isset($tplData)) {
+                                        foreach($tplData as $uzivatel) {
+                                ?>
+                                    <tr>
+                                        <td><?= $uzivatel["id"]?></td>
+                                        <td><?= $uzivatel["jmeno_uzivatele"]?></td>
+                                        <td><?= $uzivatel["prijmeni_uzivatele"]?></td>
+                                        <td><?= $uzivatel["login_uzivatele"]?></td>
+                                        <td><?= $uzivatel["email_uzivatele"]?></td>
+                                        <td><?= cisloRoleNaString($uzivatel["role_uzivatele_id"])?></td>
+                                        <td>
+                                            <form class="text-center" method="post">
+                                                <div class="btn-group" role="group" class="text-center align-middle"">
+                                                    <?php
+                                                        if ($uzivatel["role_uzivatele_id"] == 1) {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-warning d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliNaPisar" value="<?= $uzivatel["id"]?>">písař</button>
+                                                    </div>
+                                                            <?php
+                                                        } else {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-primary d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliNaPisar" value="<?= $uzivatel["id"]?>">písař</button>
+                                                    </div>
+                                                        <?php
+                                                        }
+                                                        if ($uzivatel["role_uzivatele_id"] == 2) {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-warning d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliRec" value="<?= $uzivatel["id"]?>">recenzent</button>
+                                                    </div>
+                                                        <?php
+                                                        } else {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-primary d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliRec" value="<?= $uzivatel["id"]?>">recenzent</button>
+                                                    </div>
+                                                        <?php
+                                                        }
+                                                        if ($uzivatel["role_uzivatele_id"] == 3) {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-warning d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliAdmin" value="<?= $uzivatel["id"]?>">admin</button>
+                                                    </div>
+                                                        <?php
+                                                        } else {
+                                                    ?>
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-primary d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliAdmin" value="<?= $uzivatel["id"]?>">admin</button>
+                                                    </div>
+                                                        <?php
+                                                        }
+                                                    ?>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form class="text-center" method="post">
+                                            <?php
+                                                if ($uzivatel["stav_zabanovani"] == 0) {
+                                                    ?>
+                                                <div class="mb-3">
+                                                    <button class="btn btn-danger d-block w-100" style="font-size: 12px" type="submit" name="zmenitZabanovaniZaban" value="<?= $uzivatel["id"]?>">Zabanovat</button>
+                                                </div>
+                                            <?php
+                                                } else {
+                                                    ?>
+                                                <div class="mb-3">
+                                                    <button class="btn btn-warning d-block w-100" style="font-size: 12px" type="submit" name="zmenitZabanovaniOdban" value="<?= $uzivatel["id"]?>">Odbanovat</button>
+                                                </div>
+                                            <?php
+                                                }
+                                                ?>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php
+                                        }
+                                    }
+                                ?>
+                                    <tr></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    <?php
+    }
+}
+?>

@@ -1,0 +1,76 @@
+<?php
+
+    global $login;
+
+    function stavNaStr($stav) {
+        if ($stav == 1) {
+            return "Článek na přiřazení recentům";
+        } else if ($stav == 2) {
+            return "Článek čeká na zhodnocení recenzentů";
+        } else {
+            return "Článek byl schválen";
+        }
+    }
+
+    if ($login->isUserLogged()) {
+        if ($login->getRole() == 1) {
+
+?>
+
+<section class="text-start position-relative py-4 py-xl-5" style="background: var(--bs-warning-bg-subtle);">
+    <h2 style="text-align: center;margin: 16px;height: 69.3906px;">Přehled Vašich článků</h2>
+    <div class="container-fluid">
+        <div class="card" id="TableSorterCard-1">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped table tablesorter" id="ipi-table">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th class="text-center" style="width: 203.078px;">Název článku</th>
+                                <th class="text-center" style="width: 262.312px;">autoři</th>
+                                <th class="text-center">abstrakt</th>
+                                <th class="text-center filter-false sorter-false" style="width: 335.516px;">akce</th>
+                                <th class="text-center filter-false sorter-false" style="width: 335.516px;">Stav článku</th>
+                            </tr>
+                            </thead>
+                            <tbody class="text-center">
+                            <?php
+                                if (isset($tplData)) {
+                                    foreach($tplData as $vnitrniPole) {
+                                        foreach($vnitrniPole as $clanek) {
+                            ?>
+                            <tr>
+                                <td><?= $clanek["nazev_clanku"]?></td>
+                                <td><?= $clanek["autori"]?></td>
+                                <td><?= $clanek["clanek_abstrakt"]?></td>
+                                <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                    <div class="btn-group" role="group">
+                                        <a href="NahraneClanky/<?= $clanek["odkaz"]?>">
+                                            <button class="btn btn-dark" type="button">Zobrazit</button>
+                                        </a>
+                                        <button class="btn btn-warning" type="button">Upravit</button>
+                                        <button class="btn btn-danger" type="button">Vymazat</button>
+                                    </div>
+                                </td>
+                                <td class="text-center align-middle"><?= stavNaStr($clanek["stav_zrecenzovani_clanku_id"])?></td>
+                            </tr>
+                            <?php
+                                        }
+                                    }
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="card" id="TableSorterCard"></div>
+    </div>
+                    <?php
+        }
+    }
+?>
