@@ -18,6 +18,14 @@ class SpravaClankuPisarController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    public function vymazaniClanku() {
+        if (isset($_POST["vymazaniClanku"])) {
+            var_dump($_POST["vymazaniClanku"]);
+            $this->db->odebratClanek($_POST["vymazaniClanku"]);
+            header("Location:index.php?page=spravaclankupisar");
+        }
+    }
+
     /**
      * Vrati obsah uvodni stranky.
      * @param string $pageTitle     Nazev stranky.
@@ -32,6 +40,8 @@ class SpravaClankuPisarController implements IController {
         if ($login->isUserLogged()) {
             $tplData[] = $this->db->getClankyUz($login->getID());
         }
+
+        $this->vymazaniClanku();
 
         //// vypsani prislusne sablony
         // zapnu output buffer pro odchyceni vypisu sablony

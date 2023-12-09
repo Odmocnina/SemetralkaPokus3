@@ -19,10 +19,36 @@ class SpravaClankuAdminController implements IController {
     }
 
     public function prirazeniRec() {
-        global $login;
-        if (isset($_POST["odeslaniRec"])) {
-            $this->db->priradRecenzenta($_POST["value"], $_POST["valueC"]);
+        if (isset($_POST["zvolenyRecenzent"])) {
+            $this->db->priradRecenzenta($_POST["zvolenyClanek"], $_POST["zvolenyRecenzent"]);
         }
+    }
+
+    public function odebraniRecenzenta() {
+        if (isset($_POST["OdebraniRecenzenta"])) {
+            $this->db->odebratRecenzenta($_POST["OdebraniRecenzenta"], $_POST["Clanek"]);
+        }
+    }
+
+    public function getRecenzentiClanku($clanek) {
+        return $this->db->getRecenzentyClankuJmena($clanek);
+    }
+
+    public function getRecenzentyCoJesteNerecenzuji($clanek) {
+        return $this->db->getRecenztyNerecenzujiciClanek($clanek);
+    }
+
+    public function schvaleniCiZamitnutiClanku() {
+        if (isset($_POST["Schvaleni"])) {
+            $this->db->zmenStavClanku(3, $_POST["Schvaleni"]);
+        }
+        if (isset($_POST["Zamitnuti"])) {
+            $this->db->zmenStavClanku(2, $_POST["Zamitnuti"]);
+        }
+    }
+
+    public function getRecenzeClanku($clanek, $uzivatel) {
+        return $this->db->getRecenzeClanku($clanek, $uzivatel);
     }
 
     /**
@@ -36,14 +62,15 @@ class SpravaClankuAdminController implements IController {
         $tplData = [];
         $tplData2 = [];
         $stavCekajici = 1;
-        $stavNaSchvaleni = 2;
         $roleRec = 2;
+
+        $this->prirazeniRec();
+        $this->odebraniRecenzenta();
+        $this->schvaleniCiZamitnutiClanku();
 
         $tplData[] = $this->db->getClankyStav($stavCekajici);
 
-        $tplData2[] = $this->db->getClankyStav($stavNaSchvaleni);
-
-        $tplDataRec[] = $this->db->getUzRole($roleRec);
+        $tplData2[] = $this->db->getUzRole($roleRec);
 
 
         //// vypsani prislusne sablony

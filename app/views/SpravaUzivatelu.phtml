@@ -50,6 +50,9 @@
                                         <td><?= $uzivatel["email_uzivatele"]?></td>
                                         <td><?= cisloRoleNaString($uzivatel["role_uzivatele_id"])?></td>
                                         <td>
+                                            <?php
+                                                if ($uzivatel["role_uzivatele_id"] != 3) {
+                                            ?>
                                             <form class="text-center" method="post">
                                                 <div class="btn-group" role="group" class="text-center align-middle"">
                                                     <?php
@@ -79,24 +82,17 @@
                                                     </div>
                                                         <?php
                                                         }
-                                                        if ($uzivatel["role_uzivatele_id"] == 3) {
-                                                    ?>
-                                                    <div class="mb-3">
-                                                        <button class="btn btn-warning d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliAdmin" value="<?= $uzivatel["id"]?>">admin</button>
-                                                    </div>
-                                                        <?php
-                                                        } else {
-                                                    ?>
-                                                    <div class="mb-3">
-                                                        <button class="btn btn-primary d-block w-100" style="font-size: 12px" type="submit" name="zmenitRoliAdmin" value="<?= $uzivatel["id"]?>">admin</button>
-                                                    </div>
-                                                        <?php
-                                                        }
                                                     ?>
                                                 </div>
                                             </form>
+                                            <?php
+                                            }
+                                            ?>
                                         </td>
                                         <td>
+                                            <?php
+                                                if ($uzivatel["role_uzivatele_id"] != 3) {
+                                            ?>
                                             <form class="text-center" method="post">
                                             <?php
                                                 if ($uzivatel["stav_zabanovani"] == 0) {
@@ -114,6 +110,9 @@
                                                 }
                                                 ?>
                                             </form>
+                                                    <?php
+                                                }
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php

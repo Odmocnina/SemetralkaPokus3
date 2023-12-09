@@ -1,8 +1,4 @@
 <?php
-    //require(DIRECTORY_MODELS."/MujLogin.class.php");
-    //$login = new MujLogin();
-
-
     global $login;
 
     if ($login->isUserLogged()) {
@@ -46,14 +42,6 @@
             </section>
         </div>
 <?php
-        }
-    }
-
-    $database = new DatabaseModel();
-
-    if (isset($_POST["action"])) {
-        if ($_POST["action"] == "odeslatClanek") {
-            $database->pridatClanek($_POST, $login->getID());
         }
     }
     ?>

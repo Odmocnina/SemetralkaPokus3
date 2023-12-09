@@ -4,9 +4,9 @@
 
     function stavNaStr($stav) {
         if ($stav == 1) {
-            return "Článek na přiřazení recentům";
+            return "Článek čeká na posouzení";
         } else if ($stav == 2) {
-            return "Článek čeká na zhodnocení recenzentů";
+            return "Článek byl zamítnut";
         } else {
             return "Článek byl schválen";
         }
@@ -45,13 +45,15 @@
                                 <td><?= $clanek["autori"]?></td>
                                 <td><?= $clanek["clanek_abstrakt"]?></td>
                                 <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
-                                    <div class="btn-group" role="group">
-                                        <a href="NahraneClanky/<?= $clanek["odkaz"]?>">
-                                            <button class="btn btn-dark" type="button">Zobrazit</button>
-                                        </a>
-                                        <button class="btn btn-warning" type="button">Upravit</button>
-                                        <button class="btn btn-danger" type="button">Vymazat</button>
-                                    </div>
+                                    <form class="text-center" method="post">
+                                        <div class="btn-group" role="group">
+                                            <a href="NahraneClanky/<?= $clanek["odkaz"]?>">
+                                                <button class="btn btn-dark" type="button">Zobrazit</button>
+                                            </a>
+                                            <button class="btn btn-warning" type="button">Upravit</button>
+                                            <button class="btn btn-danger" type="submit" name="vymazaniClanku" value="<?= $clanek["id"]?>">Vymazat</button>
+                                        </div>
+                                    </form>
                                 </td>
                                 <td class="text-center align-middle"><?= stavNaStr($clanek["stav_zrecenzovani_clanku_id"])?></td>
                             </tr>

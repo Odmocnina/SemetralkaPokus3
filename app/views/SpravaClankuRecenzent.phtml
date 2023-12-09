@@ -2,6 +2,8 @@
 
     global $login;
 
+    $sprava = new SpravaClankuRecenzentController();
+
     if ($login->isUserLogged()) {
         if ($login->getRole() == 2) {
 
@@ -11,6 +13,13 @@
             <div class="row mb-5">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
                     <h2>Správa článků na zrecenzování</h2>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h3>Články na zhodnocení</h3>
                 </div>
             </div>
         </div>
@@ -25,7 +34,11 @@
                                         <th class="text-center">Název článku</th>
                                         <th class="text-center">autor/autoři</th>
                                         <th class="text-center">odkaz na článek</th>
-                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení (0 až 10)</th>
+                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení obsahu</th>
+                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení formální stránky</th>
+                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení orginality</th>
+                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení jazyka</th>
+                                        <th class="text-center filter-false sorter-false" style="width: 369.484px;">hodnocení úpravy</th>
                                         <th class="text-center filter-false sorter-false" style="width: 247.484px;">odeslání</th>
                                     </tr>
                                 </thead>
@@ -45,14 +58,103 @@
                                                 </button>
                                             </a>
                                         </td>
-                                        <td class="text-center align-middle" style="max-height: 60px;height: 60px;"><input type="number" min="0" max="10"></td>
-                                        <td class="text-center align-middle" style="max-height: 60px;height: 60px;"><button class="btn btn-outline-primary" type="submit" style="border-color: var(--bs-danger-text-emphasis);color: var(--bs-danger-text-emphasis);">Odeslat</button></td>
+                                        <form class="text-center" method="post">
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                <input type="number" min="0" max="10" name="obsah" required>
+                                            </td>
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;" required>
+                                                <input type="number" min="0" max="10" name="formalita" required>
+                                            </td>
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                <input type="number" min="0" max="10" name="originalita" required>
+                                            </td>
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                <input type="number" min="0" max="10" name="jazyk" required>
+                                            </td>
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                <input type="number" min="0" max="10" name="uprava" required>
+                                            </td>
+                                            <input type="hidden" name="Clanek" value="<?=$clanek["id"]?>">
+                                            <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                <button class="btn btn-outline-primary" type="post" name="hodnoceni" style="border-color: var(--bs-danger-text-emphasis);color: var(--bs-danger-text-emphasis);">
+                                                    Odeslat
+                                                </button>
+                                            </td>
+                                        </form>
                                     </tr>
                                                 <?php
                                                 }
                                             }
                                         }
                                     ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h3>Již zhodnocené články</h3>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="card" id="TableSorterCard">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped table tablesorter" id="ipi-table">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th class="text-center">Název článku</th>
+                                    <th class="text-center">autor/autoři</th>
+                                    <th class="text-center">odkaz na článek</th>
+                                    <th class="text-center filter-false sorter-false" style="width: 369.484px;">Hodnocení článku</th>
+                                </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                <?php
+                                if (isset($tplDataZrecenzovano)) {
+                                    foreach($tplDataZrecenzovano as $vnitrniPole) {
+                                        foreach($vnitrniPole as $clanek) {
+                                            ?>
+                                            <tr>
+                                                <td><?= $clanek["nazev_clanku"]?></td>
+                                                <td><?= $clanek["autori"]?></td>
+                                                <td class="text-center align-middle" style="max-height: 60px;height: 60px;">
+                                                    <a href="NahraneClanky/<?= $clanek["odkaz"]?>">
+                                                        <button class="btn btn-primary border rounded-pill" type="button">
+                                                            Odkaz na článek
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    $poleRecenzi = $sprava->getRecenzeClanku($clanek["id"]);
+                                                    $i = 0;
+                                                    foreach ($poleRecenzi as $recenze) {
+                                                        if ($recenze["uzivatel_id"] == $login->getID()) {
+                                                    ?>
+                                                        <p>Vaše hodnocení: <?=$recenze["hodnoceni_clanku"]?></p>
+                                                    <?php
+                                                        } else {
+                                                            ?>
+                                                        <p>Hodnocení dalšího recenzenta: <?=$recenze["hodnoceni_clanku"]?></p>
+                                                    <?php
+                                                        }
+                                                    }
+                                                        ?>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                    }
+                                }
+                                ?>
                                 </tbody>
                             </table>
                         </div>

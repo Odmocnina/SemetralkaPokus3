@@ -18,6 +18,19 @@ class SpravaClankuRecenzentController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    public function odeslaniRecenze() {
+        global $login;
+        if (isset($_POST["hodnoceni"])) {
+            $prumer = $_POST["obsah"] + $_POST["formalita"] +
+                $_POST["originalita"] + $_POST["jazyk"] + $_POST["uprava"];
+            $this->db->pridejRecenzi($login->getID(), $prumer, $_POST["Clanek"]);
+        }
+    }
+
+    public function getRecenzeClanku($clanek) {
+        return $this->db->getVsechnyRecenzeClanku($clanek);
+    }
+
     /**
      * Vrati obsah uvodni stranky.
      * @param string $pageTitle     Nazev stranky.
@@ -26,9 +39,15 @@ class SpravaClankuRecenzentController implements IController {
     public function show():string {
         //// vsechna data sablony budou globalni
         global $tplData;
+        global $login;
         $tplData = [];
-        $stav = 2;
-        $tplData[] = $this->db->getClankyStav($stav);
+
+        $this->odeslaniRecenze();
+
+
+        $tplData[] = $this->db->getClankyRecenzentaNezrecenzovane($login->getID());
+
+        $tplDataZrecenzovano[] = $this->db->getClankyRecenzentaZrecenzovane($login->getID());
 
 
         //// vypsani prislusne sablony

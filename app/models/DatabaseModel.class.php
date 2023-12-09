@@ -57,8 +57,60 @@ class DatabaseModel {
         return $this->pdo->query($q)->fetchAll();
     }
 
+    public function odebratRecenzenta($uzivatel, $clanek) {
+        $this->pdo->beginTransaction();
+
+        try {
+            $q1 = "DELETE FROM ma_recenzovat WHERE uzivatel_id = '$uzivatel' AND clanek_id = '$clanek'";
+            $this->pdo->query($q1);
+
+            $q2 = "DELETE FROM recenze_clanku WHERE uzivatel_id = '$uzivatel' AND clanek_id = '$clanek'";
+            $this->pdo->query($q2);
+
+            $this->pdo->commit();
+        } catch (PDOException $e) {
+            $this->pdo->rollback();
+            error_log("Chyba při odebrání recenzenta: " . $e->getMessage());
+        }
+    }
+
+    public function odebratClanek($clanek) {
+        $this->pdo->beginTransaction();
+
+        try {
+            $q1 = "DELETE FROM recenze_clanku WHERE clanek_id = :clanek";
+            $q2 = "DELETE FROM ma_recenzovat WHERE clanek_id = :clanek";
+            $q3 = "DELETE FROM clanek WHERE id = :clanek";
+
+            $stmt1 = $this->pdo->prepare($q1);
+            $stmt2 = $this->pdo->prepare($q2);
+            $stmt3 = $this->pdo->prepare($q3);
+
+            $stmt1->bindParam(':clanek', $clanek, PDO::PARAM_INT);
+            $stmt2->bindParam(':clanek', $clanek, PDO::PARAM_INT);
+            $stmt3->bindParam(':clanek', $clanek, PDO::PARAM_INT);
+
+            $stmt1->execute();
+            $stmt2->execute();
+            $stmt3->execute();
+
+            $this->pdo->commit();
+        } catch (PDOException $e) {
+            $this->pdo->rollback();
+            error_log("Chyba při odebrání článku: " . $e->getMessage());
+        }
+    }
+
     public function getUzRole($cisloRole) {
         $q = "SELECT u.* from uzivatel u WHERE u.role_uzivatele_id = '$cisloRole'";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+
+    public function getRecenztyNerecenzujiciClanek($clanek) {
+        $q = "SELECT u.* from uzivatel u 
+           WHERE u.role_uzivatele_id = 2 AND u.id NOT IN (SELECT mr.uzivatel_id FROM ma_recenzovat mr WHERE mr.clanek_id = $clanek)";
 
         return $this->pdo->query($q)->fetchAll();
     }
@@ -69,17 +121,96 @@ class DatabaseModel {
         return $this->pdo->query($q)->fetchAll();
     }
 
-    public function getRecenzentyClanku($id_clanku) {
-        $q = "SELECT mr.* from ma_recenzovat mr WHERE mr.clanek_id = '$id_clanku'";
+    public function getRecenzentyClanku($clanek) {
+        $q = "SELECT mr.* from ma_recenzovat mr WHERE mr.clanek_id = '$clanek'";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+    public function getRecenzentyClankuJmena($clanek) {
+        $q = "SELECT u.* from uzivatel u join ma_recenzovat mr on u.id = mr.uzivatel_id WHERE mr.clanek_id = '$clanek'";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+    public function zmenStavClanku($novyStav, $clanek) {
+        $q = "UPDATE clanek SET stav_zrecenzovani_clanku_id = :novyStav WHERE id = :clanekID";
+        $stmt = $this->pdo->prepare($q);
+
+        $stmt->execute(['novyStav' => $novyStav, 'clanekID' => $clanek]);
+    }
+
+    public function pridejRecenzi($uzivatel, $hodnoceni, $clanek) {
+        $tabulkovyVkladac = "INSERT INTO recenze_clanku (id, uzivatel_id, hodnoceni_clanku, clanek_id) 
+                    VALUES (:hodnota1, :hodnota2, :hodnota3, :hodnota4)";
+
+        $stmt = $this->pdo->prepare($tabulkovyVkladac);
+
+        $stmt->bindParam(':hodnota1', $hodnota1);
+        $stmt->bindParam(':hodnota2', $hodnota2);
+        $stmt->bindParam(':hodnota3', $hodnota3);
+        $stmt->bindParam(':hodnota4', $hodnota4);
+
+        $hodnota1 = 0;
+        $hodnota2 = $uzivatel;
+        $hodnota3 = $hodnoceni;
+        $hodnota4 = $clanek;
+
+        $stmt->execute();
+    }
+
+    public function getClankyRecenzenta($recenzent) {
+        $q = "SELECT c.* from clanek c join ma_recenzovat mr on c.id = mr.clanek_id WHERE mr.uzivatel_id = '$recenzent'";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+    public function getClankyRecenzentaNezrecenzovane($recenzent) {
+        $q = "SELECT c.* 
+          FROM clanek c 
+          LEFT JOIN ma_recenzovat mr ON c.id = mr.clanek_id 
+          LEFT JOIN recenze_clanku r ON c.id = r.clanek_id AND r.uzivatel_id = '$recenzent'
+          WHERE mr.uzivatel_id = '$recenzent' AND r.id IS NULL";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+    public function getClankyRecenzentaZrecenzovane($recenzent) {
+        $q = "SELECT c.* 
+          FROM clanek c 
+          LEFT JOIN ma_recenzovat mr ON c.id = mr.clanek_id 
+          LEFT JOIN recenze_clanku r ON c.id = r.clanek_id AND r.uzivatel_id = '$recenzent'
+          WHERE mr.uzivatel_id = '$recenzent' AND r.id IS NOT NULL";
+
+        return $this->pdo->query($q)->fetchAll();
+    }
+
+    public function getRecenzeClanku($clanek, $uzivatel) {
+        $q = "SELECT r.* FROM recenze_clanku r WHERE r.clanek_id = '$clanek' AND r.uzivatel_id = '$uzivatel'";
+
+        return $this->pdo->query($q)->fetch();
+    }
+
+    public function getVsechnyRecenzeClanku($clanek) {
+        $q = "SELECT r.* FROM recenze_clanku r WHERE r.clanek_id = '$clanek'";
 
         return $this->pdo->query($q)->fetchAll();
     }
 
     public function priradRecenzenta($clanek, $recenzent) {
-        $q = "INSERT INTO ma_recenzovat (uzivatel_id, clanek_id) VALUES ($recenzent, $clanek);";
+        $q = "INSERT INTO ma_recenzovat (uzivatel_id, clanek_id) VALUES (:uzivatel_id, :clanek_id);";
         $stmt = $this->pdo->prepare($q);
 
-        $stmt->execute([$recenzent, $clanek]);
+        $stmt->bindParam(':uzivatel_id', $recenzent);
+        $stmt->bindParam(':clanek_id', $clanek);
+
+        $stmt->execute();
+    }
+
+    public function gotRecentyClanku($clanek) {
+        $q = "SELECT u.* from uzivatel u join ma_recenzovat mr on u.id = mr.id_uzivatele WHERE mr.id_clanku = '$clanek'";
+
+        return $this->pdo->query($q)->fetchAll();
     }
 
     public function zmeneniRole($noveRole, $MenenyUzivatelID) {
@@ -100,6 +231,10 @@ class DatabaseModel {
 
         $q = "SELECT * FROM ".TABLE_UZIVATEL;
         $tplData[] = $this->pdo->query($q)->fetchAll();
+
+        foreach($pole as $prvekPole) {
+            $prvekPole = htmlspecialchars($prvekPole);
+        }
 
         foreach ($tplData as $vnitrniPole) {
             foreach ($vnitrniPole as $uzivatel) {
@@ -148,6 +283,10 @@ class DatabaseModel {
         $tabulkovyVkladac = $this->pdo->prepare("INSERT INTO clanek (autori, nazev_clanku, id, stav_zrecenzovani_clanku_id, clanek_abstrakt, uzivatel_id, odkaz) 
                     VALUES (:hodnota1, :hodnota2, :hodnota3, :hodnota4, :hodnota5, :hodnota6, :hodnota7)");
 
+        foreach($pole as $prvekPole) {
+            $prvekPole = htmlspecialchars($prvekPole);
+        }
+
         $tabulkovyVkladac->bindParam(':hodnota1', $hodnota1);
         $tabulkovyVkladac->bindParam(':hodnota2', $hodnota2);
         $tabulkovyVkladac->bindParam(':hodnota3', $hodnota3);
@@ -168,31 +307,6 @@ class DatabaseModel {
 
         return true;
     }
-
-    public function zmenRoliUzivatele($uzivatel, $novaRole) {
-        //$uzivatel["role_uzivatele_id"]
-
-    }
-    
-    /**
-     *  Smaze daneho uzivatele z DB.
-     *  @param int $userId  ID uzivatele.
-     */
-    public function deleteUser(int $userId):bool {
-        // pripravim dotaz
-        $q = "DELETE FROM ".TABLE_USER." WHERE id_user = $userId";
-        // provedu dotaz
-        $res = $this->pdo->query($q);
-        // pokud neni false, tak vratim vysledek, jinak null
-        if ($res) {
-            // neni false
-            return true;
-        } else {
-            // je false
-            return false;
-        }
-    }
-    
 }
 
 ?>

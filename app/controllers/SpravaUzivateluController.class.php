@@ -56,7 +56,7 @@ class SpravaUzivateluController implements IController {
         $this->zmenRoli();
         $this->zmenBanovani();
 
-        $tplData = $this->db->getUzivateleBezAkAdm($login->getID());
+        $tplData = $this->db->getAllUzivatele();
 
         $tplDataUz[] = $this->db->getAllUzivatele();
 

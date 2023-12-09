@@ -18,17 +18,23 @@ class NahraniClankuController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    public function pridejClanek() {
+        global $login;
+        if (isset($_POST["action"])) {
+            if ($_POST["action"] == "odeslatClanek") {
+                $this->db->pridatClanek($_POST, $login->getID());
+            }
+        }
+    }
+
     /**
      * Vrati obsah uvodni stranky.
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
-        global $tplData;
-        $tplData = [];
 
-        $tplData[] = $this->db->getAllUzivatele();
+        $this->pridejClanek();
 
         //// vypsani prislusne sablony
         // zapnu output buffer pro odchyceni vypisu sablony

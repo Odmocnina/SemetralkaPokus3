@@ -18,15 +18,29 @@ class RegistraceController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    public function pridejUzivatele() {
+        $povedlaSeRegistrace = false;
+        global $login;
+
+        if (isset($_POST["action"])) {
+            if ($_POST["action"] == "registrace") {
+                $povedlaSeRegistrace = $this->db->pridatUzivatele($_POST);
+                if ($povedlaSeRegistrace) {
+                    header("Location:index.php?page=uspesnaregistrace");
+                }
+            }
+        }
+    }
+
     /**
      * Vrati obsah uvodni stranky.
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
-        global $tplData;
-        $tplData = [];
+
+        $this->pridejUzivatele();
+
 
         ob_start();
         // pripojim sablonu, cimz ji i vykonam
