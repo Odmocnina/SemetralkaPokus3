@@ -3,7 +3,7 @@
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani stranky na nahrani clanku
  */
 class NahraniClankuController implements IController {
 
@@ -18,17 +18,25 @@ class NahraniClankuController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    /**
+     * metoda zajistuji pridani noceho clanku a stazeni pdf souboru co byl na stranku nahran
+     */
     public function pridejClanek() {
         global $login;
         if (isset($_POST["action"])) {
             if ($_POST["action"] == "odeslatClanek") {
-                $this->db->pridatClanek($_POST, $login->getID());
+                $hledanySoubor = "NahraneClanky/" . basename($_FILES["soubor"]["name"]);
+                if (!file_exists($hledanySoubor)) {
+                    var_dump("dsas");
+                    move_uploaded_file($_FILES["soubor"]["tmp_name"], $hledanySoubor);
+                }
+                $this->db->pridatClanek($_POST, $_FILES["soubor"]["name"], $login->getID());
             }
         }
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky na nahrani clanku.
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
@@ -36,15 +44,10 @@ class NahraniClankuController implements IController {
 
         $this->pridejClanek();
 
-        //// vypsani prislusne sablony
-        // zapnu output buffer pro odchyceni vypisu sablony
         ob_start();
-        // pripojim sablonu, cimz ji i vykonam
         require(DIRECTORY_VIEWS ."/NahraniClanku.php");
-        // ziskam obsah output bufferu, tj. vypsanou sablonu
         $obsah = ob_get_clean();
 
-        // vratim sablonu naplnenou daty
         return $obsah;
     }
 

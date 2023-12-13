@@ -9,15 +9,16 @@ class MujLogin {
     /**Instance tridy MaSession udelana pro praci se session**/
     public $ses;
 
-
     /** @var string SESSION_KEY  Klic pro ulozeni uzivatele do session */
     const SESSION_KEY = "usr";
 
     /** @var string KEY_NAME  Klic pro ulozeni jmena do pole.  */
     const KEY_NAME = "jm";
 
+    /**klic do id uzivatele **/
     const ID_KLIC = "klicId";
 
+    /**klic do role uzivatele **/
     const ROLE_KLIC = "roleKlic";
 
     /**
@@ -47,6 +48,17 @@ class MujLogin {
             self::ROLE_KLIC => $role];
 
         $this->ses->setSession(self::SESSION_KEY, $data);
+    }
+
+    /**
+     *  odstani login pod starym jmenem a vytvori nevy pod jmenem novim
+     *  @param string $noveJmeno noveJmeno co bylo nastaveno
+     */
+    public function obnoveniLoginu($noveJmeno) {
+        $id = $this->getID();
+        $role = $this->getRole();
+        $this->logout();
+        $this->login($noveJmeno, $id, $role);
     }
 
     /**
@@ -80,6 +92,10 @@ class MujLogin {
         return $d[self::ROLE_KLIC];
     }
 
+    /**
+     *  vrati udaje o uzivateli
+     *  @param string $key     Klic do pole session.
+     */
     public function getUserInfo() {
         if(!$this->isUserLogged()) {
             return null;

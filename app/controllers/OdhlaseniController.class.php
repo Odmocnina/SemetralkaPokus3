@@ -3,7 +3,7 @@
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani odhlasovaci stranky.
  */
 class OdhlaseniController implements IController {
 
@@ -19,21 +19,15 @@ class OdhlaseniController implements IController {
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah odhlasovaci stranky.
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
-        global $tplData;
-        $tplData = [];
         global $login;
-
-        $tplData = $this->db->getAllUzivatele();
 
         ob_start();
 
-        //session_destroy();
         $login->logout();
 
         require(DIRECTORY_VIEWS ."/Odhlaseni.php");

@@ -17,7 +17,9 @@
                         <div class="d-flex">
                             <div>
                                 <p class="fw-bold mb-0"><?= $clanek["autori"]?></p>
-                                <p><?= $clanek["clanek_abstrakt"]?></p>
+                                <div class="kontent">
+                                    <p><?= $clanek["clanek_abstrakt"]?></p>
+                                </div>
                             </div>
                         </div>
                         <a href="NahraneClanky/<?= $clanek["odkaz"]?>">

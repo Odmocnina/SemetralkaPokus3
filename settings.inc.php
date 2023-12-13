@@ -97,6 +97,11 @@ const WEB_PAGES = array(
         "class_name" => "UspesnaRegistraceController",
     ),
 
+    "spravavlastnichudaju" => array(
+        "file_name" => "SpravaOsobnichUdajuController.class.php",
+        "class_name" => "SpravaOsobnichUdajuController",
+    ),
+
 );
 
 ?>

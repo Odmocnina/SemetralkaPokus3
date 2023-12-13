@@ -3,7 +3,7 @@
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani stranky s registracnim formularem
  */
 class RegistraceController implements IController {
 
@@ -18,6 +18,9 @@ class RegistraceController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    /**
+     * metoda zajistuji pridani noveho uzivatele
+     */
     public function pridejUzivatele() {
         $povedlaSeRegistrace = false;
         global $login;
@@ -33,7 +36,7 @@ class RegistraceController implements IController {
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky s registracnim formularem
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
@@ -43,12 +46,9 @@ class RegistraceController implements IController {
 
 
         ob_start();
-        // pripojim sablonu, cimz ji i vykonam
         require(DIRECTORY_VIEWS ."/Registrace.php");
-        // ziskam obsah output bufferu, tj. vypsanou sablonu
         $obsah = ob_get_clean();
 
-        // vratim sablonu naplnenou daty
         return $obsah;
     }
 

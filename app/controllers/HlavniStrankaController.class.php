@@ -30,15 +30,18 @@ class HlavniStrankaController implements IController {
         $role = 3;
         $tplData[] = $this->db->getClankyStav($role);
 
-        //// vypsani prislusne sablony
-        // zapnu output buffer pro odchyceni vypisu sablony
+        foreach ($tplData as $vnitrniPole) {
+            foreach ($vnitrniPole as $clanek) {
+                foreach ($clanek as $prvek) {
+                    $prvek = htmlspecialchars($prvek);
+                }
+            }
+        }
+
         ob_start();
-        // pripojim sablonu, cimz ji i vykonam
         require(DIRECTORY_VIEWS ."/HlavniStranka.php");
-        // ziskam obsah output bufferu, tj. vypsanou sablonu
         $obsah = ob_get_clean();
 
-        // vratim sablonu naplnenou daty
         return $obsah;
     }
 

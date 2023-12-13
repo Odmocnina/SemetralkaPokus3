@@ -53,6 +53,10 @@ class MaSession {
         unset($_SESSION[$key]);
     }
 
+    /**
+     *  Odstrani vsechny sesse.
+     *  @param string $key     Klic do pole session.
+     */
     public function removeAllSessions(){
         session_unset();
     }

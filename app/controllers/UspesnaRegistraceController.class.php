@@ -1,9 +1,8 @@
 <?php
-// nactu rozhrani kontroleru
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani stranky po uspesne registraci
  */
 class UspesnaRegistraceController implements IController {
 
@@ -19,12 +18,11 @@ class UspesnaRegistraceController implements IController {
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky po uspesne registraci
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
         global $tplData;
         $tplData = [];
         global $login;

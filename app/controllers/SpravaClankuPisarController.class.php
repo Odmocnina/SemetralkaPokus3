@@ -3,7 +3,7 @@
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani stranky s spravou clanku pro pisare
  */
 class SpravaClankuPisarController implements IController {
 
@@ -18,40 +18,44 @@ class SpravaClankuPisarController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    /**
+     * metoda co jasistje vymazani clanku pokud uzivatel si preje clanek vymazat
+     */
     public function vymazaniClanku() {
         if (isset($_POST["vymazaniClanku"])) {
-            var_dump($_POST["vymazaniClanku"]);
             $this->db->odebratClanek($_POST["vymazaniClanku"]);
             header("Location:index.php?page=spravaclankupisar");
         }
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky s spravou clanku pro pisare
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
         global $tplData;
         $tplData = [];
         global $login;
 
         if ($login->isUserLogged()) {
             $tplData[] = $this->db->getClankyUz($login->getID());
+
+            foreach ($tplData as $vnitrniPole) {
+                foreach ($vnitrniPole as $clanek) {
+                    foreach ($clanek as $prvek) {
+                        $prvek = htmlspecialchars($prvek);
+                    }
+                }
+            }
         }
 
         $this->vymazaniClanku();
 
-        //// vypsani prislusne sablony
-        // zapnu output buffer pro odchyceni vypisu sablony
         ob_start();
-        // pripojim sablonu, cimz ji i vykonam
         require(DIRECTORY_VIEWS ."/SpravaClankuPisar.phtml");
-        // ziskam obsah output bufferu, tj. vypsanou sablonu
         $obsah = ob_get_clean();
 
-        // vratim sablonu naplnenou daty
         return $obsah;
     }
 

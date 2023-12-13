@@ -1,9 +1,8 @@
 <?php
-// nactu rozhrani kontroleru
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani se spravou uzivatelu
  */
 class SpravaUzivateluController implements IController {
 
@@ -18,6 +17,9 @@ class SpravaUzivateluController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    /**
+     * metoda co zajistuje meneni role uzivatele pod admin/superadmin nekum zmeni roli
+     */
     public function zmenRoli() {
         global $login;
         if (isset($_POST["zmenitRoliNaPisar"])) {
@@ -31,6 +33,9 @@ class SpravaUzivateluController implements IController {
         }
     }
 
+    /**
+     * metoda co zajistuje meneni stavu zabanovani uzivatele, pokud admin/superadmin nekoho zabanuje/odbanuje
+     */
     public function zmenBanovani() {
         global $login;
         if (isset($_POST["zmenitZabanovaniZaban"])) {
@@ -42,12 +47,11 @@ class SpravaUzivateluController implements IController {
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky se spravou uzivatelu
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
     public function show():string {
-        //// vsechna data sablony budou globalni
         global $tplData;
         $tplData = [];
 
@@ -58,7 +62,11 @@ class SpravaUzivateluController implements IController {
 
         $tplData = $this->db->getAllUzivatele();
 
-        $tplDataUz[] = $this->db->getAllUzivatele();
+        foreach ($tplData as $uzivatel) {
+            foreach ($uzivatel as $prvek) {
+                $prvek = htmlspecialchars($prvek);
+            }
+        }
 
         ob_start();
         require(DIRECTORY_VIEWS ."/SpravaUzivatelu.phtml");

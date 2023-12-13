@@ -5,7 +5,7 @@
     $SpavaClankuController = new SpravaClankuAdminController();
 
     if ($login->isUserLogged()) {
-        if ($login->getRole() == 3) {
+        if ($login->getRole() == 3 || $login->getRole() == 4) {
 
 ?>
     <section class="position-  py-4 py-xl-5" style="background: var(--bs-warning-bg-subtle);">
@@ -195,7 +195,7 @@
                                                     if ($pocetRec != 3) {
                                                     ?>
                                                         <td>
-                                                            <button class="btn btn-success text-center" type="submit">Zadat recenzenta</button>
+                                                            <button class="btn btn-info text-center" type="submit">Zadat recenzenta</button>
                                                         </td>
                                                     <?php
                                                     } else {

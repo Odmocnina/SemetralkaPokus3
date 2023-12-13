@@ -3,7 +3,7 @@
 require_once(DIRECTORY_CONTROLLERS."/IController.interface.php");
 
 /**
- * Ovladac zajistujici vypsani uvodni stranky.
+ * Ovladac zajistujici vypsani stranky s spravou clanku pro recenzenta
  */
 class SpravaClankuRecenzentController implements IController {
 
@@ -18,6 +18,9 @@ class SpravaClankuRecenzentController implements IController {
         $this->db = new DatabaseModel();
     }
 
+    /**
+     * metoda co zajistuje poslni recenze a volanim metod database novou recenzi vytvori
+     */
     public function odeslaniRecenze() {
         global $login;
         if (isset($_POST["hodnoceni"])) {
@@ -27,12 +30,16 @@ class SpravaClankuRecenzentController implements IController {
         }
     }
 
+    /**
+     * metoda co zajistuje vraceni recenze k clanku k zadanemu clanku
+     * @parm id clanku ke kteremu zjistujeme recenze
+     */
     public function getRecenzeClanku($clanek) {
         return $this->db->getVsechnyRecenzeClanku($clanek);
     }
 
     /**
-     * Vrati obsah uvodni stranky.
+     * Vrati obsah stranky s spravou clanku pro recenzenta
      * @param string $pageTitle     Nazev stranky.
      * @return string               Vypis v sablone.
      */
@@ -44,21 +51,32 @@ class SpravaClankuRecenzentController implements IController {
 
         $this->odeslaniRecenze();
 
+        if ($login->isUserLogged()) {
+            $tplData[] = $this->db->getClankyRecenzentaNezrecenzovane($login->getID());
 
-        $tplData[] = $this->db->getClankyRecenzentaNezrecenzovane($login->getID());
+            foreach ($tplData as $vnitrniPole) {
+                foreach ($vnitrniPole as $clanek) {
+                    foreach ($clanek as $prvek) {
+                        $prvek = htmlspecialchars($prvek);
+                    }
+                }
+            }
 
-        $tplDataZrecenzovano[] = $this->db->getClankyRecenzentaZrecenzovane($login->getID());
+            $tplDataZrecenzovano[] = $this->db->getClankyRecenzentaZrecenzovane($login->getID());
 
+            foreach ($tplDataZrecenzovano as $vnitrniPole) {
+                foreach ($vnitrniPole as $clanek) {
+                    foreach ($clanek as $prvek) {
+                        $prvek = htmlspecialchars($prvek);
+                    }
+                }
+            }
+        }
 
-        //// vypsani prislusne sablony
-        // zapnu output buffer pro odchyceni vypisu sablony
         ob_start();
-        // pripojim sablonu, cimz ji i vykonam
         require(DIRECTORY_VIEWS ."/SpravaClankuRecenzent.phtml");
-        // ziskam obsah output bufferu, tj. vypsanou sablonu
         $obsah = ob_get_clean();
 
-        // vratim sablonu naplnenou daty
         return $obsah;
     }
 
